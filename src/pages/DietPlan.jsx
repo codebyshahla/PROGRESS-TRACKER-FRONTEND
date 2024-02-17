@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
 import React from 'react'
 
-function AdminRouter() {
+function DietPlan() {
   return (
     <div>
-      
+      <h1>DIET PLAN</h1>
     </div>
   )
 }
 
-export default AdminRouter
+export default DietPlan

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-
+import axios from 'axios'
 function Signup() {
   const [errMsg, setErrMsg] = useState('')
   const [formData, setFormData] = useState({
@@ -13,11 +13,7 @@ function Signup() {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Add your signup logic here
-    console.log("Signup form submitted:", formData);
-  };
+  
 
   function validation() {
     const pass = formData.password;
@@ -41,6 +37,22 @@ function Signup() {
         setErrMsg('password Doesnot match')
       }
     }
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      try {
+        // Make a POST request to your backend API to signup the user
+        const response = await axios.post('http://localhost:5000/signup',{formData})
+        console.log(formData)
+        
+  
+        if(response.data.error){
+          setErrMsg(response.data.error)
+        }
+        
+      } catch (error) {
+        console.error("Error during signup:", error);
+  }
+};
 
 
   return (
@@ -88,6 +100,7 @@ function Signup() {
               required
             />
           </div>
+          
           <div className="mb-4">
             <input
               type="password"
@@ -103,6 +116,19 @@ function Signup() {
           </div>
           {/* <p id="msg" className="text-red-500"></p> */}
           <p className=" text-red-500">{errMsg}</p>
+          <div className="mb-4">
+            <input
+              type="number"
+              id="mobileNumber"
+              name="mobileNumber"
+              placeholder="mobile number"
+              value={formData.mobileNumber}
+              onChange={handleChange} 
+              className="mt-1 p-2 w-full border rounded-full bg-transparent  placeholder:text-black  focus:outline-none focus:border-blue-500"
+              // onBlur={validation}
+              required
+            />
+          </div>
           <button
             onClick={validation}
             className="w-full py-2 px-4 bg-orange-500 text-white font-bold rounded-full hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300"
@@ -111,7 +137,7 @@ function Signup() {
           </button>{" "}
           <br /> <br />
           <p>
-            Already have an account? please <Link to="/login">Login</Link>
+            Already have an account? please <Link to="/login"><span className="text-blue-500">Login</span></Link>
           </p>
         </form>
       </div>
