@@ -1,7 +1,8 @@
+/* eslint-disable react/jsx-no-undef */
 /* eslint-disable no-unused-vars */
 import { useState } from "react";
 import "./App.css";
-import {BrowserRouter} from 'react-router-dom'
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import CommonRouter from "./Router/CommonRouter";
 function App() {
   const [count, setCount] = useState(0);
@@ -9,8 +10,9 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <CommonRouter />
-        {/* <Otp/> */}
+        <Routes>
+          <Route path="/*" element={<CommonRouter />}></Route>
+        </Routes>
       </BrowserRouter>
     </>
   );

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import axios from "axios";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
@@ -30,11 +29,11 @@ function Login() {
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
+              type="password"
+              id="password"
+              name="password"
+              placeholder="ENTER NEW PASSWORD"
+              value={formData.password}
               onChange={handleChange}
               className="mt-1 p-2 w-full border rounded-full bg-transparent placeholder:text-black  focus:outline-none focus:border-blue-500"
               required
@@ -45,7 +44,7 @@ function Login() {
               type="password"
               id="password"
               name="password"
-              placeholder="password"
+              placeholder="CONFIRM PASSWORD"
               value={formData.password}
               onChange={handleChange}
               className="mt-1 p-2 w-full border rounded-full bg-transparent placeholder:text-black  focus:outline-none focus:border-blue-500"
@@ -56,15 +55,12 @@ function Login() {
             type="submit"
             className="w-full py-2 px-4 bg-orange-500 text-white font-bold rounded-full hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300"
           >
-           Sign In
+           SET PASSWORD
           </button>{" "}
-          <br /> <br />
-          <p>
-             <Link to="/ForgotPassword"><span className="text-blue-500">Forgot Password</span></Link>
-          </p>
         </form>
       </div>
     </div>
   );
 }
 export default Login;
+

@@ -1,12 +1,14 @@
+/* eslint-disable react/jsx-no-undef */
 /* eslint-disable no-unused-vars */
 
 import axios from "axios";
 import React, { useRef, useState } from "react";
-
+import { Link } from "react-router-dom";
 function Otp() {
-  const [otpValues, setOtpValues] = useState(["", "", "", "",""]);
-  const otpRefs = [useRef(), useRef(), useRef(), useRef(),useRef()];
+  const [otpValues, setOtpValues] = useState(["", "", "", "","",""]);
+  const otpRefs = [useRef(), useRef(), useRef(), useRef(),useRef(),useRef()];
   const [phoneNumber, setphoneNumber] = useState("");
+  const [otp,setotp] = useState("");
 
   const handleChange = (index, value) => {
     setOtpValues((prevValues) => {
@@ -37,12 +39,25 @@ function Otp() {
   const Getotp = async () => {
     try {
       const res = await axios.post("http://localhost:5000/forgotPassword", {
-        phoneNumber,
+        phoneNumber
+  
       });
     } catch (error) {
       console.error("error in seding otp", error);
     }
   };
+
+  const ValidateOtp = async ()=>{
+    try {
+      console.log("Validating OTP:", otpValues.join(""));
+      const response = await axios.post('http://localhost:5000/otpVerify',{
+        otp
+      })
+    } catch (error) {
+      console.log('an error occured')
+    }
+  }
+
   return (
     <div>
       <div className="bg-gray-100 flex items-center justify-center h-screen">
@@ -80,17 +95,21 @@ function Otp() {
                 className="w-9 p-1 border rounded"
                 maxLength="1"
                 value={value}
-                onChange={(e) => handleChange(index, e.target.value)}
+                onChange={(e) => {handleChange(index, e.target.value);
+                  setotp(index,e.target.value)
+                }}
                 onKeyPress={(e) => handleKeyPress(index, e)}
+                
+
               />
             ))}
 
           </div>
           <button
-            onClick={() => console.log("Validating OTP:", otpValues.join(""))}
+            onClick={ValidateOtp}
             className="mt-6 bg-orange-400 text-white p-2 rounded w-full"
           >
-            Validate OTP
+            <Link to="/ResetPassword">Validate OTP</Link>
           </button>
         </div>
       </div>
