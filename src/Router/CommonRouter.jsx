@@ -11,6 +11,7 @@ import DietPlan from "../pages/DietPlan";
 import TimeManagement from "../pages/TimeManagement"
 import ShowHabits from "../pages/ShowHabits"
 import HabitGraph from "../pages/HabitGraph"
+import PersonalDietPlan from "../pages/PersonalDietPlan"
 function CommonRouter() {
   return (
     <>
@@ -21,10 +22,11 @@ function CommonRouter() {
         <Route path="/forgotPassword" element={<ForgotPassword/>}></Route>
         <Route path="/resetPassword" element={<ResetPassword/>}></Route>
         <Route path="/habit" element={<Habit/>}></Route>
-        <Route path="/timemanagement" element={<TimeManagement/>}></Route>
+        <Route path="/TimeManagement" element={<TimeManagement/>}></Route>
         <Route path="/dietPlan" element={<DietPlan/>}></Route>
         <Route path="/showhabits" element={<ShowHabits/>}></Route>
         <Route path="/habitgraph" element={<HabitGraph/>}></Route>
+        <Route path="/PersonalDietPlan" element={<PersonalDietPlan/>}></Route>
       </Routes> 
     </>
   );
