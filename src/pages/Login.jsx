@@ -1,9 +1,14 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable no-unused-vars */
 import axios from "axios";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { setToken } from "../redux/reduxSlice";
+import { useDispatch } from "react-redux";
 
 function Login() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -13,11 +18,21 @@ function Login() {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await axios.post('http://localhost:5000/login',{formData})
+    try {
+      const response = await axios.post("http://localhost:5000/login", {
+        formData,
+      });
+      console.log(response.data.token);
+      const jwttoken = response.data.token;
+      localStorage.setItem("jwtToken", jwttoken);
+      dispatch(setToken(jwttoken));
+      if (response.status == 200) {
+        navigate("/");
+      }
+    } catch (err) {
+      console.error(err);
+    }
     // Add your Login logic here
-    console.log("Login form submitted:", formData);
-   
-    
   };
   return (
     <div className="min-h-screen flex items-center justify-center  h-screen bg-contain ">
@@ -56,11 +71,13 @@ function Login() {
             type="submit"
             className="w-full py-2 px-4 bg-orange-500 text-white font-bold rounded-full hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300"
           >
-           Sign In
+            Sign In
           </button>{" "}
           <br /> <br />
           <p>
-             <Link to="/ForgotPassword"><span className="text-blue-500">Forgot Password</span></Link>
+            <Link to="/ForgotPassword">
+              <span className="text-blue-500">Forgot Password</span>
+            </Link>
           </p>
         </form>
       </div>

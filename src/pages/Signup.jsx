@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import {useDispatch}  from 'react-redux'
 import axios from 'axios'
+import { setToken } from "../redux/reduxSlice";
+
 function Signup() {
-  const [errMsg, setErrMsg] = useState('')
+  const  [errMsg, setErrMsg] = useState('')
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -10,6 +14,7 @@ function Signup() {
     password: "",
     confirmPassword: "",
   });
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -42,9 +47,11 @@ function Signup() {
       try {
         // Make a POST request to your backend API to signup the user
         const response = await axios.post('http://localhost:5000/signup',{formData})
-        console.log(formData)
-        
-  
+        console.log(response.data.token)
+        const jwttoken = response.data.token;
+        localStorage.setItem('jwtToken',jwttoken)
+        dispatch(setToken(jwttoken))
+
         if(response.data.error){
           setErrMsg(response.data.error)
         }

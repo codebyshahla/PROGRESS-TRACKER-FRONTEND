@@ -12,13 +12,22 @@ import TimeManagement from "../pages/TimeManagement"
 import ShowHabits from "../pages/ShowHabits"
 import HabitGraph from "../pages/HabitGraph"
 import PersonalDietPlan from "../pages/PersonalDietPlan"
+import NutritionistHome from "../pages/NutritionistHome";
+import NutritionistChat from "../pages/NutritionistChat";
+import AuthGuard from "../routeGuards/AuthGuard";
+import PublicRoute from "../routeGuards/PublicRoute"
 function CommonRouter() {
   return (
     <>
       <Routes>
         <Route path="/" element={<Home/>}></Route>
+
+      <Route path="/" element={<PublicRoute/>}>
         <Route path="/signup" element={<Signup/>}></Route>
         <Route path="/login" element={<Login/>}></Route>
+      </Route>
+
+      <Route path="/" element={<AuthGuard/>}>
         <Route path="/forgotPassword" element={<ForgotPassword/>}></Route>
         <Route path="/resetPassword" element={<ResetPassword/>}></Route>
         <Route path="/habit" element={<Habit/>}></Route>
@@ -27,6 +36,9 @@ function CommonRouter() {
         <Route path="/showhabits" element={<ShowHabits/>}></Route>
         <Route path="/habitgraph" element={<HabitGraph/>}></Route>
         <Route path="/PersonalDietPlan" element={<PersonalDietPlan/>}></Route>
+        <Route path="/NutritionistHome" element={<NutritionistHome/>}></Route>
+        <Route path="/NutritionistChat" element={<NutritionistChat/>}></Route>
+      </Route>   
       </Routes> 
     </>
   );

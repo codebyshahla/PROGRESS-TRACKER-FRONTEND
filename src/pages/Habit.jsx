@@ -1,8 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "../Components/Header";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 function Habit() {
+  const [hobby, setHobby] = useState("");
+  const [time, setTime] = useState("");
+  const [habits, setHabits] = useState([]);
+
+  // eslint-disable-next-line no-unused-vars
+  const formData = {
+    hobby: hobby,
+    time: time,
+  };
+
+  const handleAddHabit = async(e) => {
+    const newHabit = { hobby, time };
+    setHabits([...habits, newHabit]);
+    setHobby("");
+    setTime("");
+    const response = await axios.post("http://localhost:5000/Habit", formData);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const response = await axios.post("http://localhost:5000/Habit", formData);
+
+    console.log({ hobby, time });
+  };
+
   return (
     <div>
       <Header />
@@ -21,7 +48,7 @@ function Habit() {
 
         <div className="w-1/2 h-1/2 flex justify-center items-center mt-10 rounded-lg flex-wrap shadow-xl ">
           <div className="flex gap-44 my-10 flex-wrap">
-            <div className="w-80 h-96 flex flex-col flex-wrap justify-around items-center rounded-lg flex-wrap shadow-lg">
+            <div className="w-80 h-96 flex flex-col flex-wrap justify-around items-center rounded-lg shadow-lg">
               <button className="w-60 h-10 text-black hover:text-2xl rounded-lg ">
                 Dancing
               </button>
@@ -44,16 +71,26 @@ function Habit() {
                   type="text"
                   placeholder="ENTER YOUR HOBBIES"
                   className="w-60 h-10 rounded-lg p-2"
+                  value={hobby}
+                  onChange={(e) => setHobby(e.target.value)}
                 />
                 <input
                   type="time"
                   placeholder="ENTER YOUR TIME"
                   className="w-60 h-10 rounded-lg p-2"
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
                 />
-                <button className="w-52 h-10 bg-orange-500 hover:bg-blue-500 text-white rounded-lg">
+                <button
+                  className="w-52 h-10 bg-orange-500 hover:bg-blue-500 text-white rounded-lg "
+                  onClick={handleAddHabit}
+                >
                   ADD
                 </button>
-                <button className="w-52 h-10 bg-orange-500 hover:bg-blue-500 text-white rounded-lg">
+                <button
+                  className="w-52 h-10 bg-orange-500 hover:bg-blue-500 text-white rounded-lg"
+                  onClick={handleSubmit}
+                >
                   SUBMIT
                 </button>
               </div>
@@ -64,14 +101,14 @@ function Habit() {
         {/* Buttons with Gap */}
         <div className="mt-16 flex justify-between flex-wrap w-1/3">
           <Link to={"/ShowHabits"}>
-          <button className="bg-orange-500 hover:bg-blue-500 w-48 h-10 rounded-lg text-white">
-            Show my Habits
-          </button>
+            <button className="bg-orange-500 hover:bg-blue-500 w-48 h-10 rounded-lg text-white">
+              Show my Habits
+            </button>
           </Link>
           <Link to={"/HabitGraph"}>
-          <button className="bg-orange-500 hover:bg-blue-500 w-48 h-10 rounded-lg text-white">
-            Show my Graph
-          </button>
+            <button className="bg-orange-500 hover:bg-blue-500 w-48 h-10 rounded-lg text-white">
+              Show my Graph
+            </button>
           </Link>
         </div>
       </div>
