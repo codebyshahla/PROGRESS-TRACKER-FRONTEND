@@ -1,66 +1,75 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import {useDispatch}  from 'react-redux'
-import axios from 'axios'
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import axios from "axios";
 import { setToken } from "../redux/reduxSlice";
 
 function Signup() {
-  const  [errMsg, setErrMsg] = useState('')
+  const [errMsg, setErrMsg] = useState("");
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     mobileNumber: "",
     password: "",
     confirmPassword: "",
+    role: "",
   });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-  
 
   function validation() {
     const pass = formData.password;
     const confirmPass = formData.confirmPassword;
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
     const test = regex.test(pass);
-    const confirmTest = regex.test(confirmPass)
+    const confirmTest = regex.test(confirmPass);
 
     console.log(test, confirmTest);
     if (test && confirmTest) {
-    
       // Condition to check the confirm password === password
-      
-      setErrMsg('')
+
+      setErrMsg("");
       // Function to submit the form
-    } 
-      if(!test){
-        setErrMsg("password must contain 8 characters with uppercase,lowercase,special character and number..")
-      }
-      else if(pass !== confirmPass){
-        setErrMsg('password Doesnot match')
-      }
     }
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      try {
-        // Make a POST request to your backend API to signup the user
-        const response = await axios.post('http://localhost:5000/signup',{formData})
-        console.log(response.data.token)
-        const jwttoken = response.data.token;
-        localStorage.setItem('jwtToken',jwttoken)
-        dispatch(setToken(jwttoken))
-
-        if(response.data.error){
-          setErrMsg(response.data.error)
-        }
-        
-      } catch (error) {
-        console.error("Error during signup:", error);
+    if (!test) {
+      setErrMsg(
+        "password must contain 8 characters with uppercase,lowercase,special character and number.."
+      );
+    } else if (pass !== confirmPass) {
+      setErrMsg("password Doesnot match");
+    }
   }
-};
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      // Make a POST request to your backend API to signup the user
+      const response = await axios.post("http://localhost:5000/signup", {
+        formData,
+      });
+      console.log(response.data.token);
+      const jwttoken = response.data.token;
+      console.log(jwttoken);
+      localStorage.setItem("jwtToken", jwttoken);
+      dispatch(setToken(jwttoken));
+      console.log(response.data);
+      if (response.data.error) {
+        setErrMsg(response.data.error);
+        console.log(errMsg);
+      } else {
+        if (response.data.role == "client") {
+          navigate("/");
+        } else {
+          navigate('/admin/adminhome')
+        }
+      }
+    } catch (error) {
+      console.error("Error during signup:", error);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center  h-screen bg-contain ">
@@ -107,7 +116,6 @@ function Signup() {
               required
             />
           </div>
-          
           <div className="mb-4">
             <input
               type="password"
@@ -130,11 +138,29 @@ function Signup() {
               name="mobileNumber"
               placeholder="mobile number"
               value={formData.mobileNumber}
-              onChange={handleChange} 
+              onChange={handleChange}
               className="mt-1 p-2 w-full border rounded-full bg-transparent  placeholder:text-black  focus:outline-none focus:border-blue-500"
               // onBlur={validation}
               required
             />
+          </div>
+          <div className="mb-4">
+            <label
+              htmlFor="role"
+              className="block text-sm font-medium text-gray-700"
+            ></label>
+            <select
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              className="mt-1 p-2 w-full border rounded-full bg-transparent focus:outline-none focus:border-blue-500"
+              required
+            >
+              <option value="">Select Role</option>
+              <option value="client">Client</option>
+              <option value="admin">Admin</option>
+            </select>
           </div>
           <button
             onClick={validation}
@@ -144,13 +170,15 @@ function Signup() {
           </button>{" "}
           <br /> <br />
           <p>
-            Already have an account? please <Link to="/login"><span className="text-blue-500">Login</span></Link>
+            Already have an account? please{" "}
+            <Link to="/login">
+              <span className="text-blue-500">Login</span>
+            </Link>
           </p>
         </form>
       </div>
     </div>
   );
-  
 }
 
 export default Signup;

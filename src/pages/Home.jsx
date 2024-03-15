@@ -1,13 +1,41 @@
-import React from "react";
+/* eslint-disable no-unused-vars */
+import React, { useEffect, useState } from "react";
 import Header from "../Components/Header";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import habit from "../assets/Images/habit.jpg";
 import Diet from "../assets/Images/diet.jpg";
 import Time from "../assets/Images/bgW.webp";
+import axios from "axios";
+
+
+
+const token =localStorage.getItem("jwtToken")
 function Home() {
+  const [role, setRole] = useState(null);
+  const navigate = useNavigate();
+  
+  // useEffect(()=>{
+  //   const getRole =async ()=>{
+  //     try{
+  //       const response = await axios.post('http://localhost:5000/getRole',{token} );
+  //       setRole(response.data.role);
+  //       console.log(role);
+  //       }
+  //       catch(error){
+  //         console.error("Error getting role:",error);
+  //       }
+
+
+  //   }
+  //   getRole();
+
+  // },[])
+ 
+ 
   return (
     <>
       <Header />
+      
       <div className="bg-red-900 ">
         <div className=" bg-white  flex justify-center items-center py-20">
           <div className="md:px-4 md:grid md:grid-cols-2 lg:grid-cols-3 gap-10 space-y-4 md:space-y-0">
@@ -31,15 +59,14 @@ function Home() {
               </h1>
               <div className="my-4">
                 <div className="flex space-x-1 items-center"></div>
-                {/* Additional details... */}
-                <Link to={"/Habit"}>  ``
+              `
+    
                 <button className="mt-4 text-xl w-full text-white bg-orange-500 py-2 rounded-xl shadow-lg">
                   Track Your Habit
                 </button>
-                </Link>
+              
               </div>
             </div>
-            {/* Repeat the structure for the other lessons... */}
 
             <div className="max-w-md bg-white px-6 pt-6 pb-2 rounded-xl shadow-lg transform hover:scale-105 transition duration-500">
               <h3 className="mb-3 text-xl font-bold text-black">DietPlan</h3>
@@ -59,7 +86,6 @@ function Home() {
               <div className="my-4">
                 <div className="flex space-x-1 items-center"></div> <br />{" "}
                 <br />
-                {/* Additional details... */}
                 <Link to={"/DietPlan"}>
                 <button className="mt-4 text-xl w-full text-white bg-orange-500 py-2 rounded-xl shadow-lg">
                   Set Your Diet Plan
@@ -87,7 +113,6 @@ function Home() {
               </h1>
               <div className="my-4">
                 <div className="flex space-x-1 items-center"></div> <br />
-                {/* Additional details... */}
                 <Link to={"/TimeManagement"}>
                 <button className="mt-4 text-xl w-full text-white bg-orange-500 py-2 rounded-xl shadow-lg">
                   Set Your Time Management

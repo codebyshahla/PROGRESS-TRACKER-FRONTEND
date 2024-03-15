@@ -22,18 +22,23 @@ function Login() {
       const response = await axios.post("http://localhost:5000/login", {
         formData,
       });
+      console.log("response from axios", response);
       console.log(response.data.token);
       const jwttoken = response.data.token;
+      const role = response.data.role;
+      console.log(role)
       localStorage.setItem("jwtToken", jwttoken);
       dispatch(setToken(jwttoken));
-      if (response.status == 200) {
-        navigate("/");
+      if (response.status == 200 && role==='admin' ) {
+       navigate('/admin/adminhome')
+      }
+      else if(role==='client'){
+        navigate('/')
       }
     } catch (err) {
       console.error(err);
     }
-    // Add your Login logic here
-  };
+  }
   return (
     <div className="min-h-screen flex items-center justify-center  h-screen bg-contain ">
       <div className="max-w-md w-full p-8 bg-white bg-transparent shadow-md rounded-md ">

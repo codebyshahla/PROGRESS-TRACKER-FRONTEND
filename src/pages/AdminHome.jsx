@@ -2,7 +2,6 @@ import React from "react";
 import Header from "../Components/Header";
 import { Link } from "react-router-dom";
 import doctor from "../assets/Images/doctor.jpg";
-import axios from "axios";
 function NutritionistHome() {
  
   return (
@@ -11,7 +10,7 @@ function NutritionistHome() {
       <div className=" bg-white  flex justify-center items-center py-20">
         <div className="w-1/3 bg-white px-6 pt-6 pb-2 rounded-xl shadow-lg transform hover:scale-105 transition duration-500">
           <h3 className="mb-3 text-xl font-bold text-black">
-            Our Nutritionist
+            Consult Our Patients
           </h3>
           <div className="relative">
             <img
@@ -27,9 +26,9 @@ function NutritionistHome() {
           <div className="my-4">
             <div className="flex space-x-1 items-center"></div> <br />
             {/* Additional details... */}
-            <Link to={"/ClientChat"}>
+            <Link to={"/admin/AdminChat"}>
               <button className="mt-4 text-xl w-full text-white bg-orange-500 py-2 rounded-xl shadow-lg">
-                Consult Our Nutritionist
+                Consult Patients
               </button>
             </Link>
           </div>
