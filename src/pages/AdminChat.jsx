@@ -1,8 +1,48 @@
-import React, { useState } from 'react';
+/* eslint-disable no-undef */
+import axios from 'axios';
+import React, { useState, useEffect  } from 'react';
+import io from 'socket.io-client';
+import { selectToken, setToken } from "../redux/reduxSlice";
+import {  useDispatch, useSelector } from 'react-redux';
+
+
 
 function AdminChat() {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
+  const token = useSelector(selectToken);
+  const dispatch = useDispatch(); // Get dispatch function from Redux
+
+  useEffect(() => {
+    const socket = io('http://localhost:3000', { transports: ["websocket"] });
+    const fetchData = async () => {
+         console.log(token , "  : token");
+      try {
+        if (!token) {
+          if (localStorage.getItem("jwtToken")) {
+            const jwtToken = localStorage.getItem("jwtToken");
+            dispatch(setToken(jwtToken));
+            const response = await axios.get("http://localhost:5000/getMail", {
+              headers: {
+                Authorization: `Bearer ${jwtToken}` // Use jwtToken here instead of token
+              }
+            });
+            console.log(response.data); // Log or set the response data
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching role:", error);
+      }
+    };
+
+    fetchData();
+
+    socket.emit('adminConnection');
+
+    return () => {
+      socket.off('clientMessage');
+    };
+  }, [token, dispatch]); // Add token and dispatch as dependencies
 
   const handleMessageChange = (event) => {
     setMessage(event.target.value);
@@ -10,10 +50,11 @@ function AdminChat() {
 
   const handleSendMessage = () => {
     if (message.trim() !== '') {
-      setMessages([...messages, { sender: 'admin', text: message }]);
+      socket.emit('adminMessage', message);
       setMessage('');
     }
   };
+
 
   return (
     <div className="container mx-auto shadow-lg rounded-lg">

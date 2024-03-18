@@ -10,7 +10,6 @@ function AdminRoute() {
   const token = useSelector(selectToken);
   const [isAdmin, setIsAdmin] = useState(false);
   useEffect(() => {
-    console.log("lppo");
     if (!token) {
       if (localStorage.getItem("jwtToken")) {
         const jwtToken = localStorage.getItem("jwtToken");
@@ -20,7 +19,6 @@ function AdminRoute() {
       }
     } else {
       const decodedToken = async () => {
-        console.log("kooi");
         try {
             const response = await axios.get("http://localhost:5000/getRole", {
                 headers: {
@@ -30,7 +28,7 @@ function AdminRoute() {
             console.log(response.data.role );
             if (response.data.role === "admin") {
                 setIsAdmin(true);
-            }
+            } 
         } catch (error) {
             console.error("Error fetching role:", error);
         }

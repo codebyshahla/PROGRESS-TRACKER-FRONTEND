@@ -1,12 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+// import io from "socket.io-client";
 
 function ClientChat() {
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const [socket, setSocket] = useState(null);
+  useEffect(() => {
+    // const socket = io("http://localhost:3000", { transports: ["websocket"] });
+    // setSocket(socket);
+    
+    return () => {
+      // socket.off("clientMessage");
+    };
+  }, [messages]);
+  // socket.emit("clientConnection","kooi" );
 
   const handleMessageSend = () => {
-    setMessages([...messages, { text: message, sentByUser: true }]);
-    setMessage('');
+    if (message.trim() !== "") {
+      // socket.emit("clientMessage", message);
+
+      setMessage("");
+    }
   };
 
   return (
@@ -15,22 +29,33 @@ function ClientChat() {
         <div className="flex flex-col flex-grow w-full max-w-xl bg-white shadow-xl rounded-lg overflow-hidden">
           <div className="flex flex-col flex-grow h-0 p-4 overflow-auto">
             {messages.map((msg, index) => (
-              <div key={index} className={`flex w-full mt-2 space-x-3 ${msg.sentByUser ? 'justify-end' : 'justify-start'}`}>
-                <p className={`p-3 rounded-lg text-sm ${msg.sentByUser ? 'bg-white-600 text-black shadow-md rounded-l-lg rounded-br-lg' : 'bg-gray-300 text-gray-800 rounded-r-lg rounded-bl-lg'}`}>
+              <div
+                key={index}
+                className={`flex w-full mt-2 space-x-3 ${
+                  msg.sentByUser ? "justify-end" : "justify-start"
+                }`}
+              >
+                <p
+                  className={`p-3 rounded-lg text-sm ${
+                    msg.sentByUser
+                      ? "bg-white-600 text-black shadow-md rounded-l-lg rounded-br-lg"
+                      : "bg-gray-300 text-gray-800 rounded-r-lg rounded-bl-lg"
+                  }`}
+                >
                   {msg.text}
                 </p>
               </div>
             ))}
           </div>
           <div className="bg-gray-300 p-4 flex items-center">
-            <input 
-              className="flex-grow h-10 rounded px-3 text-sm mr-2" 
-              type="text" 
+            <input
+              className="flex-grow h-10 rounded px-3 text-sm mr-2"
+              type="text"
               placeholder="Type your message…"
               value={message}
-              onChange={(e) => setMessage(e.target.value)} 
+              onChange={(e) => setMessage(e.target.value)}
             />
-            <button 
+            <button
               className="bg-orange-500 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500"
               onClick={handleMessageSend}
             >
