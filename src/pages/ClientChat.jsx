@@ -1,24 +1,56 @@
 import React, { useState, useEffect } from "react";
-// import io from "socket.io-client";
+import { io } from "socket.io-client";
+import axiosinstance from "../api/axios";
+import { selectToken } from "../redux/reduxSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 function ClientChat() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [socket, setSocket] = useState(null);
+  const [email, setEmail] = useState("");
+  const token = useSelector(selectToken);
+  const dispatch = useDispatch();
+  const recieverEmail = "dfg@gmail.com";
+
   useEffect(() => {
-    // const socket = io("http://localhost:3000", { transports: ["websocket"] });
-    // setSocket(socket);
-    
-    return () => {
-      // socket.off("clientMessage");
+    const fetchData = async () => {
+      try {
+        const response = await axiosinstance.get("/getMail");
+        setEmail(response.data.email);
+      } catch (error) {
+        console.error("Error fetching email:", error);
+      }
     };
-  }, [messages]);
-  // socket.emit("clientConnection","kooi" );
+
+    fetchData();
+
+    const newSocket = io("http://localhost:3000", {
+      transports: ["websocket"],
+    });
+
+    newSocket.on("connect", () => {
+      console.log("Connected to server");
+      newSocket.emit("userConnection", { token });
+    });
+
+    newSocket.on("recieverMessage", ({ message, senderEmail }) => {
+      console.log("Received message:", message, "from:", senderEmail);
+      setMessages(prevMessages => [...prevMessages, { text: message, sentByUser: false }]);
+    });
+
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [dispatch, token]);
 
   const handleMessageSend = () => {
     if (message.trim() !== "") {
-      // socket.emit("clientMessage", message);
-
+      console.log("Sending message:", message, "to:", recieverEmail);
+      socket.emit("message", { recieverEmail, message });
+      setMessages(prevMessages => [...prevMessages, { text: message, sentByUser: true }]);
       setMessage("");
     }
   };
