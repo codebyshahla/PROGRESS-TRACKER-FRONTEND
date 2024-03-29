@@ -4,6 +4,7 @@ import io from "socket.io-client";
 import axiosinstance from "../api/axios";
 import { selectToken } from "../redux/reduxSlice";
 import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
 
 function AdminChat() {
   // State variables
@@ -60,7 +61,7 @@ function AdminChat() {
   console.log(messages , " messa");
 
   // Function to send message via socket
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (message.trim() !== "") {
       socket.emit("message", {  message ,sender:adminEmail, reciever:recieverEmail });
       console.log("Sent message:", message);
@@ -69,6 +70,8 @@ function AdminChat() {
         { text: message, sender: adminEmail, reciever:recieverEmail , sentByUser: true },
       ]);
       setMessage("");
+      const messages = await axios.post("http://localhost:3000/postMessages",{message,sender:adminEmail, reciever:recieverEmail})
+
     }
   };
 
