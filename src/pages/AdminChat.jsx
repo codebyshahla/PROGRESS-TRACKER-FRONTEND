@@ -9,6 +9,7 @@ function AdminChat() {
   // State variables
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const [adminEmail, setAdminEmail] = useState("");
   const [recieverEmail, setRecieverEmail] = useState("");
   const [filteredReceivers, setFilteredReceivers] = useState([]);
   const [socket, setSocket] = useState(null);
@@ -26,7 +27,7 @@ function AdminChat() {
       try {
         const response = await axiosinstance.get("/getMail");
         const email = response.data.email;
-        setRecieverEmail(email);
+        setAdminEmail(email);
       } catch (error) {
         console.error("Error fetching email:", error);
       }
@@ -37,19 +38,20 @@ function AdminChat() {
     socket.emit("userConnection", { token });
 
     // Handle received messages
-    socket.on("recieverMessage", ({ message, senderEmail }) => {
-      console.log("Received message:", message, "from:", senderEmail);
+    socket.on("recieverMessage", ({ message,sender , reciever }) =>{
+      console.log("Received message:", message, "from:", sender);
       setMessages((prevMessages) => [
         ...prevMessages,
-        { text: message, sender: senderEmail, sentByUser: false },
+        { text: message, sender: sender, reciever:reciever, sentByUser: false },
       ]);
     });
-
+  
     // Clean up event listeners
     return () => {
       socket.off("message");
     };
   }, [token, dispatch]);
+  console.log(adminEmail , "lkj");
 
   // Function to handle message input change
   const handleMessageChange = (event) => {
@@ -60,11 +62,11 @@ function AdminChat() {
   // Function to send message via socket
   const handleSendMessage = () => {
     if (message.trim() !== "") {
-      socket.emit("message", { recieverEmail, message });
+      socket.emit("message", {  message ,sender:adminEmail, reciever:recieverEmail });
       console.log("Sent message:", message);
       setMessages((prevMessages) => [
         ...prevMessages,
-        { text: message, sender: "Admin", sentByUser: true },
+        { text: message, sender: adminEmail, reciever:recieverEmail , sentByUser: true },
       ]);
       setMessage("");
     }
@@ -72,7 +74,11 @@ function AdminChat() {
 
   const Recievers = (email) => {
     setRecieverEmail(email);
-    
+    const filterdMessages = messages.filter((message)=>{
+      return message.sender === "Admin" || message.sender === email
+    }
+    )
+    setMessages(filterdMessages);
   };
   // useEffect to fetch users
   useEffect(() => {

@@ -1,23 +1,28 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import axiosinstance from "../api/axios";
 import { selectToken } from "../redux/reduxSlice";
 import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
 
 function ClientChat() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [socket, setSocket] = useState(null);
-  const [email, setEmail] = useState("");
+  const [clientEmail, setClientEmail] = useState("");
+  const [adminEmail, setAdminEmail] = useState("");
   const token = useSelector(selectToken);
   const dispatch = useDispatch();
-  const recieverEmail = "dfg@gmail.com";
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axiosinstance.get("/getMail");
-        setEmail(response.data.email);
+        setClientEmail(response.data.email);
+
+        const admin = await axiosinstance.get("/getAdmin");
+        const adminEmail = admin.data.adminEmail;
+        setAdminEmail(adminEmail);
       } catch (error) {
         console.error("Error fetching email:", error);
       }
@@ -34,9 +39,12 @@ function ClientChat() {
       newSocket.emit("userConnection", { token });
     });
 
-    newSocket.on("recieverMessage", ({ message, senderEmail }) => {
-      console.log("Received message:", message, "from:", senderEmail);
-      setMessages(prevMessages => [...prevMessages, { text: message, sentByUser: false }]);
+    newSocket.on("recieverMessage", ({ message, sender , reciever }) => {
+      console.log("Received message:", message, "from:",  sender);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: message, sender, reciever, sentByUser: false },
+      ]);
     });
 
     setSocket(newSocket);
@@ -45,15 +53,30 @@ function ClientChat() {
       newSocket.disconnect();
     };
   }, [dispatch, token]);
-
-  const handleMessageSend = () => {
+  console.log(adminEmail, " : adminEmail");
+  const handleMessageSend =async () => {
     if (message.trim() !== "") {
-      console.log("Sending message:", message, "to:", recieverEmail);
-      socket.emit("message", { recieverEmail, message });
-      setMessages(prevMessages => [...prevMessages, { text: message, sentByUser: true }]);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          text: message,
+          sender: clientEmail,
+          reciever: adminEmail,
+          sentByUser: true,
+        },
+      ]);
       setMessage("");
+      socket.emit("message", {
+        sender: clientEmail,
+        reciever: adminEmail,
+        message,
+      });
+      const messages = await axios.post("http://localhost:3000/postMessages",{message,sender:clientEmail, reciever:adminEmail
+      });
+      
     }
   };
+  console.log(messages, "messu");
 
   return (
     <div>
