@@ -39,50 +39,79 @@ function AdminChat() {
     socket.emit("userConnection", { token });
 
     // Handle received messages
-    socket.on("recieverMessage", ({ message,sender , reciever }) =>{
+    socket.on("recieverMessage", ({ message, sender, reciever }) => {
       console.log("Received message:", message, "from:", sender);
       setMessages((prevMessages) => [
         ...prevMessages,
-        { text: message, sender: sender, reciever:reciever, sentByUser: false },
+        {
+          message: message,
+          sender: sender,
+          reciever: reciever,
+          sentByUser: false,
+        },
       ]);
     });
-  
+
     // Clean up event listeners
     return () => {
       socket.off("message");
     };
   }, [token, dispatch]);
-  console.log(adminEmail , "lkj");
 
   // Function to handle message input change
   const handleMessageChange = (event) => {
     setMessage(event.target.value);
   };
-  console.log(messages , " messa");
+  console.log(messages, " messa");
 
   // Function to send message via socket
   const handleSendMessage = async () => {
     if (message.trim() !== "") {
-      socket.emit("message", {  message ,sender:adminEmail, reciever:recieverEmail });
+      socket.emit("message", {
+        message,
+        sender: adminEmail,
+        reciever: recieverEmail,
+      });
       console.log("Sent message:", message);
       setMessages((prevMessages) => [
         ...prevMessages,
-        { text: message, sender: adminEmail, reciever:recieverEmail , sentByUser: true },
+        {
+          message: message,
+          sender: adminEmail,
+          reciever: recieverEmail,
+          sentByUser: true,
+        },
       ]);
       setMessage("");
-      const messages = await axios.post("http://localhost:3000/postMessages",{message,sender:adminEmail, reciever:recieverEmail})
-
+      const messages = await axios.post("http://localhost:3000/postMessages", {
+        message,
+        sender: adminEmail,
+        reciever: recieverEmail,
+      });
     }
   };
 
-  const Recievers = (email) => {
+  const Recievers = async (email) => {
     setRecieverEmail(email);
-    const filterdMessages = messages.filter((message)=>{
-      return message.sender === "Admin" || message.sender === email
+    try {
+      const response = await axios.post("http://localhost:3000/getMessages", {
+        sender: adminEmail,
+        reciever: email,
+      });
+      const Allmessages = response.data;
+
+      const filterdMessages = Allmessages.filter((message) => {
+        return (
+          (message.sender === adminEmail && message.reciever === email) ||
+          (message.sender == email && message.reciever == adminEmail)
+        );
+      });
+      setMessages(filterdMessages); // Merge new messages with old messages
+    } catch (error) {
+      console.log(error);
     }
-    )
-    setMessages(filterdMessages);
   };
+
   // useEffect to fetch users
   useEffect(() => {
     async function fetchUsers() {
@@ -134,7 +163,8 @@ function AdminChat() {
             <div
               key={index}
               className={`flex w-full mt-2 space-x-3 ${
-                msg.sentByUser ? "justify-end" : "justify-start"
+                msg.sender === adminEmail
+                 ? "justify-end" : "justify-start"
               }`}
             >
               <p
@@ -150,7 +180,7 @@ function AdminChat() {
               <div className="flex flex-col ml-4">
                 <div className="text-lg font-semibold">{msg.sender}</div>
                 <div className="bg-gray-200 rounded-lg p-3 text-gray-800">
-                  {msg.text}
+                  {msg.message}
                 </div>
               </div>
             </div>

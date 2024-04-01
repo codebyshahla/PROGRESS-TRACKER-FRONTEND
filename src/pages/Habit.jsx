@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Header from "../Components/Header";
 import { Link } from "react-router-dom";
 import axios from "axios";
-
+import axiosinstance from "../api/axios";
 function Habit() {
   const [hobby, setHobby] = useState("");
   const [time, setTime] = useState("");
@@ -19,14 +19,13 @@ function Habit() {
     setHabits([...habits, newHabit]);
     setHobby("");
     setTime("");
-    const response = await axios.post("http://localhost:5000/Habit", formData);
   };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const response = await axios.post("http://localhost:5000/Habit", formData);
-
+    
+    const response = await axiosinstance.post('/postHabit',formData);
+    const formData = response.data;
     console.log({ hobby, time });
   };
 

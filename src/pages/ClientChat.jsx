@@ -18,65 +18,82 @@ function ClientChat() {
     const fetchData = async () => {
       try {
         const response = await axiosinstance.get("/getMail");
-        setClientEmail(response.data.email);
+        const email = response.data.email;
+        setClientEmail(email);
 
         const admin = await axiosinstance.get("/getAdmin");
         const adminEmail = admin.data.adminEmail;
         setAdminEmail(adminEmail);
+        // fetching messages
+        const responseMessage = await axios.post(
+          "http://localhost:3000/getMessages",
+          {
+            sender: email,
+            reciever: adminEmail,
+          }
+        );
+        const Allmessages = responseMessage.data;
+        console.log(email, " clint");
+        console.log(Allmessages, "mess");
+        setMessages(Allmessages);
       } catch (error) {
         console.error("Error fetching email:", error);
       }
     };
 
-    fetchData();
-
     const newSocket = io("http://localhost:3000", {
       transports: ["websocket"],
     });
+    fetchData();
 
     newSocket.on("connect", () => {
       console.log("Connected to server");
       newSocket.emit("userConnection", { token });
     });
-
-    newSocket.on("recieverMessage", ({ message, sender , reciever }) => {
-      console.log("Received message:", message, "from:",  sender);
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { text: message, sender, reciever, sentByUser: false },
-      ]);
-    });
-
     setSocket(newSocket);
 
     return () => {
       newSocket.disconnect();
     };
   }, [dispatch, token]);
+
+  useEffect(() => {
+    if (!socket) return;
+    socket.on("recieverMessage", ({ message, sender, reciever }) => {
+      console.log("Received message:", message, "from:", sender);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { message: message, sender, reciever, sentByUser: false },
+      ]);
+    });
+  }, [socket]);
   console.log(adminEmail, " : adminEmail");
-  const handleMessageSend =async () => {
+
+  const handleMessageSend = async () => {
     if (message.trim() !== "") {
       setMessages((prevMessages) => [
         ...prevMessages,
         {
-          text: message,
+          message: message,
           sender: clientEmail,
           reciever: adminEmail,
           sentByUser: true,
         },
       ]);
+      console.log(message, " messa");
       setMessage("");
       socket.emit("message", {
         sender: clientEmail,
         reciever: adminEmail,
         message,
       });
-      const messages = await axios.post("http://localhost:3000/postMessages",{message,sender:clientEmail, reciever:adminEmail
+      const messages = await axios.post("http://localhost:3000/postMessages", {
+        message,
+        sender: clientEmail,
+        reciever: adminEmail,
       });
-      
     }
   };
-  console.log(messages, "messu");
 
   return (
     <div>
@@ -87,17 +104,17 @@ function ClientChat() {
               <div
                 key={index}
                 className={`flex w-full mt-2 space-x-3 ${
-                  msg.sentByUser ? "justify-end" : "justify-start"
+                  msg.sender == clientEmail ? "justify-end" : "justify-start"
                 }`}
               >
                 <p
                   className={`p-3 rounded-lg text-sm ${
-                    msg.sentByUser
-                      ? "bg-white-600 text-black shadow-md rounded-l-lg rounded-br-lg"
+                    msg.reciever == adminEmail
+                      ? "bg-white-600 text-black shadow-md rounded-l-lg rounded-br-lg justify-start : justify-end"
                       : "bg-gray-300 text-gray-800 rounded-r-lg rounded-bl-lg"
                   }`}
                 >
-                  {msg.text}
+                  {msg.message}
                 </p>
               </div>
             ))}
@@ -115,6 +132,23 @@ function ClientChat() {
               onClick={handleMessageSend}
             >
               Send
+            </button>
+            <button className="bg-green-500 text-white rounded-md text-sm hover:bg-blue-500 px-3 py-2 flex">
+              PAY
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 8.25H9m6 3H9m3 6-3-3h1.5a3 3 0 1 0 0-6M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                />
+              </svg>
             </button>
           </div>
         </div>

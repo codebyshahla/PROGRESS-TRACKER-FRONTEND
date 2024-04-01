@@ -18,7 +18,6 @@ const AuthGuard = () => {
         navigate("/login");
       }
     } else {
-      console.log(token ," kjhgjh");
       
       const decodedToken = async () => {
         const response = await axios.get(
